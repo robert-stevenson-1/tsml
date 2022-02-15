@@ -64,7 +64,6 @@ public abstract class WekaTools {
              data) {
             int i = (int) instance.classValue();
             classQuantity[i]++;
-            System.out.println(i);
         }
 
         for (int i = 0; i < classNum; i++) {

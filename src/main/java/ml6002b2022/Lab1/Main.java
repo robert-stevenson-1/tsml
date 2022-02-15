@@ -1,4 +1,4 @@
-package ML_Module;
+package ml6002b2022.Lab1;
 
 public class Main {
 

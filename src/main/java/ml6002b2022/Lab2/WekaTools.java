@@ -1,6 +1,7 @@
-package ML_Module;
+package ml6002b2022.Lab2;
 
 import weka.classifiers.Classifier;
+import weka.classifiers.trees.j48.Distribution;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -26,11 +27,10 @@ public abstract class WekaTools {
         try{
             FileReader reader = new FileReader(fullPath);
             instances = new Instances(reader);
+            instances.setClassIndex(instances.numAttributes()-1);
         }catch(Exception e){
             System.out.println("Exception caught: " + e);
         }
-        assert instances != null;
-        instances.setClassIndex(instances.numAttributes()-1);
         return instances;
     }
 
@@ -56,9 +56,10 @@ public abstract class WekaTools {
         int classNum = data.numClasses();
         double[] classQuantity = new double[classNum];
 
-        for (Instance i :
-                data) {
-            classQuantity[i.classValue()]++;
+        for (Instance instance:
+             data) {
+            int i = instance.classAttribute().index();
+            System.out.println(i);
         }
 
         for (int i = 0; i < classNum; i++) {
@@ -70,7 +71,7 @@ public abstract class WekaTools {
 
     //test helper functions
     public static void main(String[] args) {
-        String dataPath = "Arsenal_TRAIN.arff";
+        String dataPath = ".\\src\\main\\java\\ml6002b2022\\Lab2\\Arsenal_TEST.arff";
         Instances data = loadClassificationData(dataPath);
         System.out.println(data);
 

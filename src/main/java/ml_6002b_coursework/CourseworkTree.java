@@ -1,8 +1,13 @@
 package ml_6002b_coursework;
 
+import utilities.ClassifierTools;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Classifier;
 import weka.core.*;
 
+import experiments.data.*;
+
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -113,6 +118,9 @@ public class CourseworkTree extends AbstractClassifier {
         /** Attribute used for splitting, if null the node is a leaf. */
         Attribute bestSplit = null;
 
+        /** Best Split value learned on construction for  numeric attribute data */
+        private double bestSplitValue;
+
         /** Best gain from the splitting measure if the node is not a leaf. */
         double bestGain = 0;
 
@@ -124,6 +132,7 @@ public class CourseworkTree extends AbstractClassifier {
 
         /** The class distribution if the node is a leaf. */
         double[] leafDistribution;
+
 
         /**
          * Recursive function for building the tree.
@@ -143,12 +152,19 @@ public class CourseworkTree extends AbstractClassifier {
                 if (gain > bestGain) {
                     bestSplit = data.attribute(i);
                     bestGain = gain;
+                    bestSplitValue = attSplitMeasure.getSplitVal(); // learn the best split value
                 }
             }
 
             // If we found an attribute to split on, create child nodes.
             if (bestSplit != null) {
-                Instances[] split = attSplitMeasure.splitData(data, bestSplit);
+                Instances[] split;
+                if (bestSplit.isNumeric()) {
+                    split = attSplitMeasure.splitDataOnNumeric(data, bestSplit, 0);
+                    bestSplitValue = attSplitMeasure.getSplitVal(); // learn the best split value
+                }else{
+                    split = attSplitMeasure.splitData(data, bestSplit);
+                }
                 children = new TreeNode[split.length];
 
                 // Create a child for each value in the selected attribute, and determine whether it is a leaf or not.
@@ -194,7 +210,11 @@ public class CourseworkTree extends AbstractClassifier {
             if (bestSplit == null) {
                 return leafDistribution;
             } else {
-                return children[(int) inst.value(bestSplit)].distributionForInstance(inst);
+                if (inst.value(bestSplit) < bestSplitValue){
+                    return children[0].distributionForInstance(inst);
+                }else {
+                    return children[1].distributionForInstance(inst);
+                }
             }
         }
 
@@ -240,12 +260,110 @@ public class CourseworkTree extends AbstractClassifier {
         }
     }
 
+    //Adjust the tree's split criterion by changing the split measures via the 'splitMeasureOpt' parameter
+    public void setOptions(SPLIT_OPTIONS splitMeasureOpt){
+        switch (splitMeasureOpt){
+            case INFO_GAIN:
+                setAttSplitMeasure(new IGAttributeSplitMeasure());
+                break;
+            case INFO_GAIN_RATIO:
+                setAttSplitMeasure(new IGAttributeSplitMeasure(false));
+                break;
+            case CHI_SQUARED:
+                setAttSplitMeasure(new ChiSquaredAttributeSplitMeasure());
+                break;
+            case GINI:
+                setAttSplitMeasure(new GiniAttributeSplitMeasure());
+                break;
+        }
+    }
+
+    // Enum used for setting up the attribute slitting measure option
+    public enum SPLIT_OPTIONS{
+        INFO_GAIN,
+        INFO_GAIN_RATIO,
+        CHI_SQUARED,
+        GINI
+    }
+
     /**
      * Main method.
      *
      * @param args the options for the classifier main
      */
-    public static void main(String[] args) {
-        System.out.println("Not Implemented.");
+    public static void main(String[] args) throws Exception {
+        // load whisky data for test
+        Instances optDigitsData = DatasetLoading.loadData("src/main/java/ml_6002b_coursework/test_data/optdigits.arff");
+
+        CourseworkTree CWtreeIG = new CourseworkTree();
+        CourseworkTree CWtreeIGRatio = new CourseworkTree();
+        CourseworkTree CWtreeChiSquare = new CourseworkTree();
+        CourseworkTree CWtreeGini = new CourseworkTree();
+
+        System.out.println(
+                "===============================================\n" +
+                "=================optDigit Data=================\n" +
+                "===============================================\n");
+        CWtreeIG.setOptions(SPLIT_OPTIONS.INFO_GAIN);
+        CWtreeIGRatio.setOptions(SPLIT_OPTIONS.INFO_GAIN_RATIO);
+        CWtreeChiSquare.setOptions(SPLIT_OPTIONS.CHI_SQUARED);
+        CWtreeGini.setOptions(SPLIT_OPTIONS.GINI);
+
+        //split the data randomly in 1/2 into a training and test set via the WekaTools class split method
+        Instances[] splitData = WekaTools.splitData(optDigitsData, 0.5); // index 1: Train, index 0: Test
+
+        //build and train the classifiers
+        CWtreeIG.buildClassifier(splitData[0]);
+        CWtreeIGRatio.buildClassifier(splitData[0]);
+        CWtreeChiSquare.buildClassifier(splitData[0]);
+        CWtreeGini.buildClassifier(splitData[0]);
+
+        // test the accuracy of the classifiers
+        System.out.println("DT using measure <measureInformationGain> on optdigits problem has test accuracy = "
+                + ClassifierTools.accuracy(splitData[1], CWtreeIG));
+        System.out.println("DT using measure <measureInformationGainRatio> on optdigits problem has test accuracy = "
+                + ClassifierTools.accuracy(splitData[1], CWtreeIGRatio));
+        System.out.println("DT using measure <measureGini> on optdigits problem has test accuracy = "
+                + ClassifierTools.accuracy(splitData[1], CWtreeGini));
+        System.out.println("DT using measure <measureChiSquared> on optdigits problem has test accuracy = "
+                + ClassifierTools.accuracy(splitData[1], CWtreeChiSquare));
+
+        System.out.println(
+                "===============================================\n" +
+                "================Chinatown Data=================\n" +
+                "===============================================\n");
+        Instances chinatownData = DatasetLoading.loadData("src/main/java/ml_6002b_coursework/test_data/Chinatown.arff");
+        //Instances chinatownData = DatasetLoading.loadData("src/main/java/ml_6002b_coursework/test_data/Whisky.arff");
+
+
+        CWtreeIG = new CourseworkTree();
+        CWtreeIGRatio = new CourseworkTree();
+        CWtreeChiSquare = new CourseworkTree();
+        CWtreeGini = new CourseworkTree();
+
+        CWtreeIG.setOptions(SPLIT_OPTIONS.INFO_GAIN);
+        CWtreeIGRatio.setOptions(SPLIT_OPTIONS.INFO_GAIN_RATIO);
+        CWtreeChiSquare.setOptions(SPLIT_OPTIONS.CHI_SQUARED);
+        CWtreeGini.setOptions(SPLIT_OPTIONS.GINI);
+
+        //split the data randomly in 1/2 into a training and test set via the WekaTools class split method
+        Instances[] chinaSplitData = WekaTools.splitData(chinatownData, 0.5); // index 1: Train, index 0: Test
+
+        //build and train the classifiers
+        CWtreeIG.buildClassifier(chinaSplitData[0]);
+        CWtreeIGRatio.buildClassifier(chinaSplitData[0]);
+        CWtreeChiSquare.buildClassifier(chinaSplitData[0]);
+        CWtreeGini.buildClassifier(chinaSplitData[0]);
+        // test the accuracy of the classifiers
+        System.out.println("DT using measure <measureInformationGain> on Chinatown problem has test accuracy = "
+                + ClassifierTools.accuracy(chinaSplitData[1], CWtreeIG));
+        System.out.println("DT using measure <measureInformationGainRatio> on Chinatown problem has test accuracy = "
+                + ClassifierTools.accuracy(chinaSplitData[1], CWtreeIGRatio));
+        System.out.println("DT using measure <measureGini> on Chinatown problem has test accuracy = "
+                + ClassifierTools.accuracy(chinaSplitData[1], CWtreeGini));
+        System.out.println("DT using measure <measureChiSquared> on Chinatown problem has test accuracy = "
+                + ClassifierTools.accuracy(chinaSplitData[1], CWtreeChiSquare));
+
+
     }
 }

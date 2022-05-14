@@ -1,8 +1,5 @@
 package ml_6002b_coursework;
 
-import org.checkerframework.checker.units.qual.A;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -34,7 +31,7 @@ public class AttributeMeasures {
             attriValTotals.add(attriValTotal);
             total += attriValTotal;
         }
-        System.out.println("Total: " + total);
+//      System.out.println("Total: " + total);
 
         // calc entropy for each attribute
         for (int a = 0; a < table.length; a++){ // loop through each different attribute value
@@ -56,16 +53,16 @@ public class AttributeMeasures {
             obsClassTotals.add(tempClassTotal);
         }
 
-        System.out.println("AttriValTotals: " + attriValTotals);
-        System.out.println("ObsScoreTotal: " + obsClassTotals);
-        System.out.println("Entropy: " + entropy);
+//        System.out.println("AttriValTotals: " + attriValTotals);
+//        System.out.println("ObsScoreTotal: " + obsClassTotals);
+//        System.out.println("Entropy: " + entropy);
 
         //get parent entropy and add it to the information gain ready to subtract from
         for (int i = 0; i < obsClassTotals.size(); i++) {
             infoGain += (obsClassTotals.get(i)/total)*log2Ent(obsClassTotals.get(i)/total);
         }
         infoGain *= -1;
-        System.out.println("Entropy of Parent: " + infoGain);
+//        System.out.println("Entropy of Parent: " + infoGain);
 
         //calc the information gain
         for (int i = 0; i < entropy.size(); i++) {
@@ -95,7 +92,7 @@ public class AttributeMeasures {
             splitInfo += ((a/total)*log2Ent((a/total)));
         }
         splitInfo *= -1;
-        System.out.println("Split Info: " + splitInfo);
+//        System.out.println("Split Info: " + splitInfo);
         return gain/splitInfo;
     }
 
@@ -146,10 +143,9 @@ public class AttributeMeasures {
 
     public static double measureChiSquared(int[][] table){
         ArrayList<Integer> attriValTotals = new ArrayList<>(); // totals for each row
-        ArrayList<Integer> obsClassTotals = new ArrayList<>(); // totals for each column
         ArrayList<Double> globalProb = new ArrayList<>(); // global probability for each class value
         double total = 0; // total num of cases
-        double chiSquare = 0; // return metric
+        double chiSquare = 0.0; // return metric
 
         //calc the total and the attributes value totals
         for (int[] attriVal :
@@ -166,11 +162,10 @@ public class AttributeMeasures {
             for (int j = 0; j < table.length; j++) {
                 tempClassTotal += table[j][i];
             }
-            obsClassTotals.add(tempClassTotal);
             globalProb.add(tempClassTotal/total);
         }
-        System.out.println("ObsScoreTotal: " + obsClassTotals);
-        System.out.println("global Prob: " + globalProb);
+//        System.out.println("ObsScoreTotal: " + obsClassTotals);
+//        System.out.println("global Prob: " + globalProb);
 
         //calculate the chi-squared statistic
         for (int i = 0; i < table.length; i++) { // for every attribute value in the contingency table
@@ -179,7 +174,7 @@ public class AttributeMeasures {
                 // and square the result. Then divide by the expected value and add the result to
                 // the chi-squared statistic
                 double expected = attriValTotals.get(i)*globalProb.get(j); //calc the expect val of the is cell of
-                System.out.println("Table ["+i+"]["+j+"] expected value: " + expected);
+//                System.out.println("Table ["+i+"]["+j+"] expected value: " + expected);
                 // the contingency table
                 chiSquare += (Math.pow(table[i][j] - expected, 2)/expected);
             }
@@ -208,8 +203,6 @@ public class AttributeMeasures {
      * @param args the options for the attribute measure main
      */
     public static void main(String[] args) {
-        System.out.println("Not Implemented.");
-
 /*        int[][] WhiskyData = {
                 {1, 0, 1, 1},
                 {1, 1, 1, 1},
@@ -230,18 +223,16 @@ public class AttributeMeasures {
         };
 
         System.out.println("===============================");
-/*
         int[][] peatyObsTab = {
                 {4, 0}, // High/Yes (1)
                 {1, 5} // Low/No (0)
         };
-*/
-        int[][] peatyObsTab = { // Tony's table, used as a 2nd set of data to verify the infoGain and Chi-Squared calc
+/*        int[][] ObsTab = { // Tony's table, used as a 2nd set of data to verify the infoGain and Chi-Squared calc
                 {2, 3}, // Sunny
                 {4, 0}, // Overcast
                 {3, 2} // Sunny
-        };
-/*        int[][] peatyObsTab = { // https://www.kdnuggets.com/2020/02/decision-tree-intuition.html ConTab for
+        };*/
+/*        int[][] ObsTab = { // https://www.kdnuggets.com/2020/02/decision-tree-intuition.html ConTab for
                                     // verifying Gini calc. Accessed: 10/05/2022.
                 {3, 2}, // Sunny
                 {4, 0}, // Overcast

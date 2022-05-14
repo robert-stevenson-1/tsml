@@ -63,16 +63,21 @@ public abstract class AttributeSplitMeasure {
             splitData[1] = new Instances(data, data.numInstances());
 
             // no splitVal specified so calculate the best value
-            //TODO: Try Reduction on variance: https://www.analyticsvidhya.com/blog/2020/06/4-ways-split-decision-tree/
-            if (splitVal == 0){ // calc the meanattSplitMeasure = {IGAttributeSplitMeasure@791}
+            if (splitVal == 0){ // calc the mean attSplitMeasure = {IGAttributeSplitMeasure@791}
+            /*
+            This loop to calc the mean doesn't calc the same as 'meanOrMode' for the attribute and results in
+            the courseworkTree have the potentially to recursively build the tree leading to stackoverflow error
+
+            Found 'meanOrMode' @ https://weka.sourceforge.io/doc.dev/weka/core/Instances.html#meanOrMode-weka.core.Attribute-
+            */
 /*
-            This loop to calc the mean doesn't calc the same as 
                 for (Instance inst :
                         data) {
                     this.splitVal += inst.value(att);
                 }
                 this.splitVal /= data.numInstances();*/
-                this.splitVal = data.meanOrMode(att);
+                //TODO: Try Reduction on variance: https://www.analyticsvidhya.com/blog/2020/06/4-ways-split-decision-tree/
+                this.splitVal = data.meanOrMode(att); // calc the mean
             }else {
                 this.splitVal =splitVal;
             }

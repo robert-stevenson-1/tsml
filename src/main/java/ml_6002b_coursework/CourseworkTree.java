@@ -161,7 +161,12 @@ public class CourseworkTree extends AbstractClassifier {
                 Instances[] split;
                 if (bestSplit.isNumeric()) {
                     split = attSplitMeasure.splitDataOnNumeric(data, bestSplit, 0);
+
+                    // Added based on my interpretation from the guidance given in:
+                    //   https://learn.uea.ac.uk/webapps/discussionboard/do/message?action=list_messages&course_id=_135859_1&nav=discussion_board&conf_id=_117994_1&forum_id=_14532618_1&message_id=_4585997_1#
+                    //   from the Blackboard Discussion board question asked in 01/05/2022, and answered on 03/05/2022
                     bestSplitValue = attSplitMeasure.getSplitVal(); // learn the best split value
+
                 }else{
                     split = attSplitMeasure.splitData(data, bestSplit);
                 }

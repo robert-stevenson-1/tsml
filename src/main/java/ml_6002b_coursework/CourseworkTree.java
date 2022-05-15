@@ -297,7 +297,7 @@ public class CourseworkTree extends AbstractClassifier {
      * @param args the options for the classifier main
      */
     public static void main(String[] args) throws Exception {
-        // load whisky data for test
+        // load data for test
         Instances optDigitsData = DatasetLoading.loadData("src/main/java/ml_6002b_coursework/test_data/optdigits.arff");
 
         CourseworkTree CWtreeIG = new CourseworkTree();
@@ -338,7 +338,6 @@ public class CourseworkTree extends AbstractClassifier {
                 "================Chinatown Data=================\n" +
                 "===============================================\n");
         Instances chinatownData = DatasetLoading.loadData("src/main/java/ml_6002b_coursework/test_data/Chinatown.arff");
-        //Instances chinatownData = DatasetLoading.loadData("src/main/java/ml_6002b_coursework/test_data/Whisky.arff");
 
 
         CWtreeIG = new CourseworkTree();

@@ -76,7 +76,7 @@ public abstract class AttributeSplitMeasure {
                     this.splitVal += inst.value(att);
                 }
                 this.splitVal /= data.numInstances();*/
-                //TODO: Try Reduction on variance: https://www.analyticsvidhya.com/blog/2020/06/4-ways-split-decision-tree/
+                //TODO: Try Reduction on variance instead: https://www.analyticsvidhya.com/blog/2020/06/4-ways-split-decision-tree/
                 this.splitVal = data.meanOrMode(att); // calc the mean
             }else {
                 this.splitVal =splitVal;

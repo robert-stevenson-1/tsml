@@ -128,6 +128,14 @@ public class TreeEnsemble extends AbstractClassifier {
       this.seed = seed;
    }
 
+   public double getProportionOfAttributes() {
+      return proportionOfAttributes;
+   }
+
+   public void setProportionOfAttributes(double proportionOfAttributes) {
+      this.proportionOfAttributes = proportionOfAttributes;
+   }
+
    public static void main(String[] args) throws Exception {
 
       System.out.println(
